@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from AssetRegisterReader import AssetRegister
 from DB import ArchivaDB
@@ -34,16 +34,16 @@ app.add_middleware(
 
 asset_register = AssetRegister()
 
-@app.get("/")
+@app.get("/", tags=["root"])
 async def root():
     return {"start": "Welcome to Archiva API", "last_updated": "23/09/2024"}
 
-@app.get("/assets")
+@app.get("/assets", tags=["assets"])
 async def assets():
     _assets = asset_register.read_assets_json_file()
     return _assets
 
-@app.get("/asset/{asset_num}")
+@app.get("/asset/{asset_num}", tags=["assets"])
 async def asset(asset_num: str):
     _assets = asset_register.read_assets_json_file()
     for each_asset in _assets:
@@ -57,7 +57,7 @@ async def asset(asset_num: str):
                 "condition": ""
             }
 
-@app.get("/update_assets")
+@app.get("/update_assets", tags=["assets"])
 async def update_assets():
     try:
         asset_register.export_to_json()
@@ -65,7 +65,7 @@ async def update_assets():
     except Exception:
         return {"success": False, "message": traceback.print_exc()}
     
-@app.get("/dhuvas")
+@app.get("/dhuvas", tags=["dhuvas"])
 async def dhuvas():
     try:
         result = DB.get_dhuvas()
@@ -74,7 +74,7 @@ async def dhuvas():
         return {"success": False, "result": traceback.print_exc()}
     
 
-@app.post("/dhuvas/add/")
+@app.post("/dhuvas/add/", tags=["dhuvas"])
 async def add_dhuvas(dhuvas: Dhuvas):
     try:
         DB.add_dhuvas(
@@ -88,7 +88,7 @@ async def add_dhuvas(dhuvas: Dhuvas):
     except Exception:
         return {"success": False, "message": traceback.print_exc()}
 
-@app.post("/dhuvas/remove/")
+@app.post("/dhuvas/remove/", tags=["dhuvas"])
 async def remove_dhuvas(dhuvas: Dhuvas):
     try:
         DB.remove_dhuvas(dhuvasId = dhuvas.id)
@@ -96,24 +96,24 @@ async def remove_dhuvas(dhuvas: Dhuvas):
     except Exception:
         return {"success": False, "message": traceback.print_exc()}
 
-@app.get("/racks/")
+@app.get("/racks/", tags=["records"])
 async def racks():
     """Used to get the details of all the racks in the records room."""
     return DB.get_racks()
 
-@app.get("/racks/{rackRoute}")
+@app.get("/racks/{rackRoute}", tags=["records"])
 async def get_rack(rackRoute: str):
     """Used to get the details of a specifc rack in the records room."""
     return DB.get_rack(rackRoute.lower())
 
-@app.get("/records/all")
+@app.get("/records/all", tags=["records"])
 async def get_all_records():
     """Used to get all the records in the database."""
     # results = DB.get_records()
     results = [{"name": record, "rack": rack} for record, rack in DB.get_records()]
     return results
 
-@app.get("/records/search/{query}")
+@app.get("/records/search/{query}", tags=["records"])
 async def searchRecords(query: str):
     """
     Used to search for records in the database.\n 
@@ -123,7 +123,7 @@ async def searchRecords(query: str):
     results = [(record, rack) for record, rack in records if query in record]
     return results
 
-@app.post("/pvs")
+@app.post("/pvs", tags=["pvs"])
 async def add_PV(pv: PaymentVoucher):
     try:
         DB.add_pv(pv)
@@ -132,7 +132,7 @@ async def add_PV(pv: PaymentVoucher):
         return {"success": False, "message": traceback.print_exc()}
 
 
-@app.get("/pvs")
+@app.get("/pvs", tags=["pvs"])
 async def get_PVs():
     try:
         result = DB.get_pvs()
@@ -141,7 +141,7 @@ async def get_PVs():
         return {"success": False, "result": traceback.print_exc()}
 
 
-@app.put("/pvs")
+@app.put("/pvs", tags=["pvs"])
 async def update_PV(pv: PaymentVoucher):
     """Updates a PV"""
     try:
@@ -151,7 +151,7 @@ async def update_PV(pv: PaymentVoucher):
         return {"success": False, "result": traceback.print_exc()}
 
 
-@app.get("/pvs/{pvNum}")
+@app.get("/pvs/{pvNum}", tags=["pvs"])
 async def get_PV(pvNum: str):
     try:
         result = DB.get_pv(pvNum)
@@ -159,7 +159,7 @@ async def get_PV(pvNum: str):
     except:
         return {"success": False, "result": traceback.print_exc()}
 
-@app.delete("/pvs/{pvNum}")
+@app.delete("/pvs/{pvNum}", tags=["pvs"])
 async def delete_PV(pvNum: str):
     try:
         result = DB.delete_pv(pvNum)

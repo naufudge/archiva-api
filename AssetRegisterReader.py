@@ -9,7 +9,7 @@ class AssetRegister:
 
     def get_assets(self):
         """
-        Get all assets' data. \n
+        Get all assets' data.
         Returns a list of dictionaries. Each dictionary will be in the following format:
         
         ``{
