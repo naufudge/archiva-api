@@ -1,11 +1,24 @@
 from openpyxl import load_workbook
 from typing import List, Dict, Tuple
-import json
+import json, os
 
 
 class AssetRegister:
     def __init__(self, filename: str = "NA Asset Register 2023.xlsx"):
-        self.register = load_workbook(filename, read_only=True)
+        # Check if the "NA Asset Register 2023.xlsx" file exists, if not then use any other .xlsx file in the same folder
+        if os.path.exists(filename):
+            self.register = load_workbook(filename, read_only=True)
+        else:
+            # Find any other .xlsx file in the same folder
+            folder = os.path.dirname(filename) or "."
+            xlsx_files = [f for f in os.listdir(folder) if f.endswith(".xlsx")]
+            
+            if xlsx_files:
+                fallback_file = os.path.join(folder, xlsx_files[0])
+                print(f"Default file not found. Using fallback file: {fallback_file}")
+                self.register = load_workbook(fallback_file, read_only=True)
+            else:
+                raise FileNotFoundError("No .xlsx file found in the folder.")
 
     def get_assets(self):
         """
@@ -26,6 +39,7 @@ class AssetRegister:
         for sheet_name in sheets:
             current_sheet = self.register[sheet_name]
 
+            # Rows doesn't start from 1, so we need to find the row where the titles are
             if current_sheet["A12"].value and current_sheet["A12"].value.strip() == "#":
                 titles_row = 12
             elif current_sheet["A13"].value and current_sheet["A13"].value.strip() == "#":
