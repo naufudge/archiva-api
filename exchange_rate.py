@@ -22,7 +22,9 @@ def get_exchange_rates():
             temp_data.append((cells[1].text, cells[2].text))
         i+=1
 
-    data = {}
+    data = {
+        "USD": 15.42
+    }
     # print("Value of each currency in MVR")
     for each in temp_data:
         new_value = mvr_to_dollar / float(each[1])
