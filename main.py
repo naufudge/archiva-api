@@ -4,6 +4,7 @@ from AssetRegisterReader import AssetRegister
 from DB import ArchivaDB
 from schema import Dhuvas, PaymentVoucher
 from typing import List, Dict
+from exchange_rate import get_exchange_rates
 import traceback
 
 app = FastAPI(
@@ -165,6 +166,15 @@ async def get_PV(pvNum: str):
 async def delete_PV(pvNum: str):
     try:
         result = DB.delete_pv(pvNum)
+        return {"success": True, "result": result}
+    except:
+        return {"success": False, "result": traceback.print_exc()}
+
+@app.get("/exchange_rates", tags=["pvs"])
+async def exchange_rates():
+    """Get the exchange rates from the MMA website"""
+    try:
+        result = get_exchange_rates()
         return {"success": True, "result": result}
     except:
         return {"success": False, "result": traceback.print_exc()}
