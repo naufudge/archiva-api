@@ -33,3 +33,9 @@ class PaymentVoucher(BaseModel):
     postingDate: Optional[datetime] = None
     clearingDoc: Dict[str, str | datetime | None]
     transferNum: Optional[str] = None
+
+
+class Staff(BaseModel):
+    _id: Optional[str] = None
+    name: str
+    designation: str

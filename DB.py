@@ -177,9 +177,33 @@ class ArchivaDB:
         pvCollection = self.BandeyriDatabase["pv"]
 
         pvCollection.delete_one({"pvNum": pvNum})
-        
+    
+    def get_staff(self):
+        """Get the exisitng staff of NAM from the DB."""
+        staffCollection: List[Dict] = self.BandeyriDatabase["staff"].find({})
 
+        return [ {
+            "_id": str(staff["_id"]),
+            "name": staff["name"],
+            "designation": staff["designation"]
+        } for staff in staffCollection]
 
+    def add_staff(self, name: str, designation: str):
+        """Add a new staff with their ``name`` and ``designation``."""
+        staffCollection = self.BandeyriDatabase["staff"]
+        staffCollection.insert_one({
+            "name": name,
+            "designation": designation
+        })
+
+    def delete_staff(self, staffId: str):
+        staffCollection = self.BandeyriDatabase["staff"]
+        try:
+            staffCollection.delete_one({"_id": ObjectId(staffId)})
+            return True
+        except Exception:
+            print(traceback.print_exc())
+            return False
 
 if __name__ == "__main__":
     db = ArchivaDB()

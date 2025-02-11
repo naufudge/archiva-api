@@ -2,7 +2,7 @@ from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from AssetRegisterReader import AssetRegister
 from DB import ArchivaDB
-from schema import Dhuvas, PaymentVoucher
+from schema import Dhuvas, PaymentVoucher, Staff
 from typing import List, Dict
 from exchange_rate import get_exchange_rates
 import traceback
@@ -175,6 +175,34 @@ async def exchange_rates():
     """Get the exchange rates from the MMA website"""
     try:
         result = get_exchange_rates()
+        return {"success": True, "result": result}
+    except:
+        return {"success": False, "result": traceback.print_exc()}
+    
+
+@app.get("/staff", tags=["General"])
+async def get_staff():
+    """Get the exisitng staff of NAM from the DB."""
+    try:
+        result = DB.get_staff()
+        return {"success": True, "result": result}
+    except:
+        return {"success": False, "result": traceback.print_exc()}
+
+@app.post("/staff", tags=["General"])
+async def add_staff(staff: Staff):
+    """Add a new staff with their name and designation."""
+    try:
+        DB.add_staff(name=staff.name, designation=staff.designation)
+        return {"success": True, "result": "Successfully added new staff!"}
+    except:
+        return {"success": False, "result": traceback.print_exc()}
+
+@app.delete("/staff/{staffId}", tags=["General"])
+async def delete_staff(staffId: str):
+    """Delete an exisiting staff"""
+    try:
+        result = DB.delete_staff(staffId)
         return {"success": True, "result": result}
     except:
         return {"success": False, "result": traceback.print_exc()}
