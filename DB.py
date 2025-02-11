@@ -98,7 +98,13 @@ class ArchivaDB:
         pv: Dict = self.BandeyriDatabase["pv"].find_one({"pvNum": pvNum})
         pv.pop("_id")
         return pv
-        
+    
+    def get_latest_pv(self):
+        """Get the latest added PV"""
+        latest_pv = self.BandeyriDatabase["pv"].find_one(sort=[("_id", -1)])
+        latest_pv.pop("_id")
+        return latest_pv
+
     def add_pv(self, PV: PaymentVoucher):
         """Adds the PV to the database"""
         pvCollection = self.BandeyriDatabase["pv"]

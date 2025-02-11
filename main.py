@@ -161,6 +161,15 @@ async def get_PV(pvNum: str):
         return {"success": True, "result": result}
     except:
         return {"success": False, "result": traceback.print_exc()}
+    
+@app.get("/pv/latest", tags=["pvs"])
+async def get_latest_PV():
+    """Get the latest added PV."""
+    try:
+        result = DB.get_latest_pv()
+        return {"success": True, "result": result}
+    except:
+        return {"success": False, "result": traceback.print_exc()}
 
 @app.delete("/pvs/{pvNum}", tags=["pvs"])
 async def delete_PV(pvNum: str):
