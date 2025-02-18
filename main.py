@@ -1,5 +1,6 @@
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
+from datetime import datetime
 from AssetRegisterReader import AssetRegister
 from DB import ArchivaDB
 from schema import Dhuvas, PaymentVoucher, Staff
@@ -143,6 +144,50 @@ async def get_PVs():
     except Exception:
         return {"success": False, "result": traceback.print_exc()}
 
+@app.get("/pv/gl/{year}", tags=["pvs"])
+async def get_GL_totals_by_year(year: str):
+    """Get the total for each GL account for the specified year."""
+    try:
+        data: List[Dict] = DB.get_pvs()
+        result = {}
+        for pv in data:
+            # date = pv["date"]
+
+            # # If the date is not a datetime object, convert it into one.
+            # if type(date) == str:
+            #     date = datetime.fromisoformat(pv["date"])
+
+            if year in pv["pvNum"]:
+                invoiceDetails: List[Dict[str, str | None | int | List[Dict]]] = pv["invoiceDetails"]
+                for invoice in invoiceDetails:
+                    glDetails = invoice["glDetails"]
+                    for GL in glDetails:
+                        glCode = int(GL["code"])
+                        amount = float(GL["amount"])
+
+                        # Checking if the GL code already exists in the GL dictionary defined above.
+                        if result.get(glCode) == None:
+                            result[glCode] = amount
+                        else:
+                            result[glCode] += amount
+
+        return {"success": True, "result": result}
+    except:
+        return {"success": False, "result": traceback.print_exc()}
+
+@app.get("/pv/year/{year}", tags=["pvs"])
+async def get_PVs_by_year(year: str):
+    """Get all the PVs from the year passed in."""
+    try:
+        data: List[Dict] = DB.get_pvs()
+        results = []
+        for pv in data:
+            if year in pv["pvNum"]:
+                results.append(pv)
+
+        return {"success": True, "result": results}
+    except:
+        return {"success": False, "result": traceback.print_exc()}
 
 @app.put("/pvs", tags=["pvs"])
 async def update_PV(pv: PaymentVoucher):
