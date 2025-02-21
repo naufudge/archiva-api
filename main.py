@@ -1,12 +1,15 @@
-from fastapi import FastAPI, APIRouter
-from fastapi.middleware.cors import CORSMiddleware
-from datetime import datetime
-from AssetRegisterReader import AssetRegister
-from DB import ArchivaDB
-from schema import Dhuvas, PaymentVoucher, Staff
-from typing import List, Dict
-from exchange_rate import get_exchange_rates
 import traceback
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
+from typing import List, Dict
+
+from ExportPvRegister import ExportPvRegister
+from DB.DB import ArchivaDB
+from AssetRegisterReader import AssetRegister
+from exchange_rate import get_exchange_rates
+from schema import Dhuvas, PaymentVoucher, Staff
+
 
 app = FastAPI(
     title="ArchivaAPI",
@@ -14,6 +17,7 @@ app = FastAPI(
 )
 
 DB = ArchivaDB()
+EXPORT = ExportPvRegister()
 
 origins = [
     "http://localhost:3000",
@@ -179,13 +183,24 @@ async def get_GL_totals_by_year(year: str):
 async def get_PVs_by_year(year: str):
     """Get all the PVs from the year passed in."""
     try:
-        data: List[Dict] = DB.get_pvs()
-        results = []
-        for pv in data:
-            if year in pv["pvNum"]:
-                results.append(pv)
+        results: List[Dict] = DB.get_pvs_by_year(year)
 
         return {"success": True, "result": results}
+    except:
+        return {"success": False, "result": traceback.print_exc()}
+
+@app.get("/pv/export/{year}", tags=["pvs"])
+async def export_PVs(year: str):
+    """Export the PVs of a certain year to an excel file."""
+    try:
+        pvs = DB.get_pvs_by_year(year)
+        output = EXPORT.export_to_excel(pvs)
+
+        return StreamingResponse(
+            output,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f"attachment; filename=pv_register_{year}.xlsx"}
+        )
     except:
         return {"success": False, "result": traceback.print_exc()}
 

@@ -105,6 +105,17 @@ class ArchivaDB:
         latest_pv.pop("_id")
         return latest_pv
 
+    def get_pvs_by_year(self, year: int | str):
+        """Query DB to get PVs by a certain year."""
+        query = {"pvNum": {"$regex": str(year), "$options": "i"}}
+        pvCollection: List[Dict] = self.BandeyriDatabase["pv"].find(query)
+        results: List[Dict] = []
+        for pv in pvCollection:
+            # pv["_id"] = str(pv["_id"])
+            pv.pop("_id")
+            results.append(pv)
+        return results
+
     def add_pv(self, PV: PaymentVoucher):
         """Adds the PV to the database"""
         pvCollection = self.BandeyriDatabase["pv"]
