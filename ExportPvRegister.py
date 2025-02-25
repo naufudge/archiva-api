@@ -63,13 +63,13 @@ class ExportPvRegister:
             for invoice in invoices:
                 # Convert invoice number to integer if possible
                 try:
-                    invoiceNumber = int(invoice["invoiceNumber"])
+                    invoiceNumber = str(invoice["invoiceNumber"])
                 except:
                     invoiceNumber = invoice["invoiceNumber"] if invoice["invoiceNumber"] else ""
                 
                 # Convert Document number to integer if possible
                 try:
-                    documentNum = int(invoice["documentNum"])
+                    documentNum = str(invoice["documentNum"])
                 except:
                     documentNum = invoice["documentNum"] if invoice["documentNum"] else ""
 
@@ -94,7 +94,7 @@ class ExportPvRegister:
                             "transferNum": pv["transferNum"]
                         }
                         final.append(result)
-                    except KeyError as e:
+                    except KeyError:
                         print(traceback.print_exc())
                         print(pv["pvNum"])
         
