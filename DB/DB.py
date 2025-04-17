@@ -222,5 +222,12 @@ class ArchivaDB:
             print(traceback.print_exc())
             return False
 
+    def update_staff(self, _id: str, name: str, designation: str):
+        staffCollection = self.BandeyriDatabase["staff"]
+        return staffCollection.find_one_and_update({ "_id":  ObjectId(_id) }, { "$set": {
+            "name": name,
+            "designation": designation
+        }})
+
 if __name__ == "__main__":
     db = ArchivaDB()

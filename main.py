@@ -275,3 +275,12 @@ async def delete_staff(staffId: str):
         return {"success": True, "result": result}
     except:
         return {"success": False, "result": traceback.print_exc()}
+
+@app.patch("/staff/{staffId}", tags=["General"])
+async def update_staff(staffId: str, staff: Staff):
+    """Update existing staff information."""
+    try:
+        result = DB.update_staff(staffId, staff.name, staff.designation)
+        return {"success": True, "result": result}
+    except:
+        return {"success": False, "result": traceback.print_exc()}
