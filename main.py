@@ -272,7 +272,7 @@ async def delete_staff(staffId: str):
     """Delete an exisiting staff"""
     try:
         result = DB.delete_staff(staffId)
-        return {"success": True, "result": result}
+        return {"success": True, "result": "Successfully deleted this staff!"}
     except:
         return {"success": False, "result": traceback.print_exc()}
 
@@ -281,6 +281,6 @@ async def update_staff(staffId: str, staff: Staff):
     """Update existing staff information."""
     try:
         result = DB.update_staff(staffId, staff.name, staff.designation)
-        return {"success": True, "result": result}
+        return {"success": True, "result": "Successfully added new staff!"}
     except:
         return {"success": False, "result": traceback.print_exc()}
