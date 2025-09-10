@@ -5,10 +5,11 @@ import traceback
 from typing import Dict, List, Tuple
 from schema import PaymentVoucher
 from datetime import datetime
+import os
 
 class ArchivaDB:
     def __init__(self):
-        uri = "mongodb://10.12.29.68:27017/?directConnection=true"
+        uri = os.getenv("MONGO_URI", "mongodb://mongo:27017/?directConnection=true")
         self.client = MongoClient(uri, server_api=ServerApi('1'))
         self.DhuvasDatabase = self.client["365"]
         self.RacksDatabase = self.client["racks"]

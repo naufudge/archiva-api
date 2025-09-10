@@ -5,12 +5,14 @@ import json, os
 
 class AssetRegister:
     def __init__(self, filename: str = "NA Asset Register 2023.xlsx"):
+        data_dir = os.getenv("DATA_DIR", ".")
+        filename = filename if os.path.isabs(filename) else os.path.join(data_dir, filename)
         # Check if the "NA Asset Register 2023.xlsx" file exists, if not then use any other .xlsx file in the same folder
         if os.path.exists(filename):
             self.register = load_workbook(filename, read_only=True)
         else:
             # Find any other .xlsx file in the same folder
-            folder = os.path.dirname(filename) or "."
+            folder = os.getenv("DATA_DIR", os.path.dirname(filename) or ".")
             xlsx_files = [f for f in os.listdir(folder) if f.endswith(".xlsx")]
             
             if xlsx_files:
@@ -109,8 +111,8 @@ class AssetRegister:
     def export_to_json(self):
         """Exports the assets' information into a JSON file called `assets.json`"""
         data = self.get_assets()
-        
-        with open("assets.json", "w", encoding="utf-8") as json_file:
+        assets_path = os.path.join(os.getenv("DATA_DIR", "."), "assets.json")
+        with open(assets_path, "w", encoding="utf-8") as json_file:
             json.dump(data, json_file, indent=4)
         
         return
@@ -118,7 +120,8 @@ class AssetRegister:
     def read_assets_json_file(self):
         """Reads the data from the exported `assets.json` file"""
         try:
-            with open("assets.json", "r", encoding="utf-8") as json_file:
+            assets_path = os.path.join(os.getenv("DATA_DIR", "."), "assets.json")
+            with open(assets_path, "r", encoding="utf-8") as json_file:
                 data: List[Dict[str, str]] = json.load(json_file)
             return data
         except FileNotFoundError:
