@@ -4,3 +4,4 @@ openpyxl
 pymongo
 httpx[http2]==0.13.3
 beautifulsoup4==4.11.2
+pandas

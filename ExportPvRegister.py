@@ -1,9 +1,14 @@
 import traceback
-import pandas as pd
 from io import BytesIO
 from typing import List
 from datetime import datetime
 from DB.models import PV
+
+# Optional dependency: pandas
+try:
+    import pandas as pd
+except Exception:
+    pd = None
 
 
 # def convert_to_datetime(date_str: str) -> datetime:
@@ -78,7 +83,7 @@ class ExportPvRegister:
                     try:
                         result = {
                             "date": date,
-                            "pvNum": f"1506{self.pv_no_delimiter}{pv["pvNum"].replace("-", self.pv_no_delimiter)}",
+                            "pvNum": f"1506{self.pv_no_delimiter}{pv['pvNum'].replace('-', self.pv_no_delimiter)}",
                             "documentNum": documentNum,
                             "poNum": pv["poNum"],
                             "invoiceNumber": invoiceNumber,
@@ -98,9 +103,17 @@ class ExportPvRegister:
                         print(traceback.print_exc())
                         print(pv["pvNum"])
         
+        if pd is None:
+            # If pandas is not available, return a small empty excel to avoid crashing
+            output = BytesIO()
+            output.write(b"")
+            output.seek(0)
+            return output
+
         df = pd.DataFrame(final)
-        df.rename(columns=self.COLUMN_MAPPING, inplace=True)
-        df = df[self.COLUMN_ORDER]
+        if not df.empty:
+            df.rename(columns=self.COLUMN_MAPPING, inplace=True)
+            df = df[self.COLUMN_ORDER]
 
         output = BytesIO()
         with pd.ExcelWriter(output, engine="openpyxl") as writer:

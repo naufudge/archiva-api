@@ -20,7 +20,9 @@ class AssetRegister:
                 print(f"Default file not found. Using fallback file: {fallback_file}")
                 self.register = load_workbook(fallback_file, read_only=True)
             else:
-                raise FileNotFoundError("No .xlsx file found in the folder.")
+                # Do not raise; allow API to start even without Excel files
+                print("Warning: No .xlsx file found in DATA_DIR. Assets endpoints will return empty data until a file is provided.")
+                self.register = None
 
     def get_assets(self):
         """
@@ -35,6 +37,8 @@ class AssetRegister:
             "condition": ""
         }``
         """
+        if not self.register:
+            return []
         sheets = self.register.sheetnames
         results: List[Dict[str, str]] = [] # Will store the details of all the assets
 
